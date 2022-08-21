@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css">
+    
+    <py-env>
+        - pandas 
+        - folium
+    </py-env>
+    <title>My PyScript Map</title>
+</head>
+<body>
+    <div id="map" style="width:100%;height:100%;"></div>
+
+    <py-script output="map">
+import folium
+import pandas as pd
+import json
+
+from pyodide.http import open_url
+
+url_provinces = "https://raw.githubusercontent.com/onlyphantom/pyscript-folium/main/data/IDN_province.json"
+url_sqm = "https://raw.githubusercontent.com/onlyphantom/pyscript-folium/main/data/Indonesia_Province_sqm.csv"
+provinces_json = json.load(open_url(url_provinces))
+
+sqm = pd.read_csv(open_url(url_sqm))
+
+m = folium.Map(location=[-3.981234, 137.2088999], zoom_start=6, tiles="Stamen Terrain")
+
+folium.Choropleth(
+    geo_data=provinces_json,
+    name="SQM of provinces",
+    data=sqm,
+    columns=['Province', 'area(Km2)'],
+    key_on="feature.properties.NAME_1",
+    fill_color='YlGn',
+    fill_opacity=0.7,
+    line_opacity=0.2
+).add_to(m)
+
+folium.LayerControl().add_to(m)
+
+m
+    </py-script>
+</body>
+</html>
